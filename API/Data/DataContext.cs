@@ -2,6 +2,7 @@ using API.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace API.Data
 {
@@ -36,13 +37,13 @@ namespace API.Data
 
             modelBuilder.Entity<UserLike>()
                 .HasKey(k => new { k.SourceUserId, k.LikedUserId });
-            
+
             modelBuilder.Entity<UserLike>()
                 .HasOne(s => s.SourceUser)
                 .WithMany(l => l.LikedUsers)
                 .HasForeignKey(s => s.SourceUserId)
                 .OnDelete(DeleteBehavior.Cascade);
-            
+
             modelBuilder.Entity<UserLike>()
                 .HasOne(s => s.LikedUser)
                 .WithMany(l => l.LikedByUsers)
@@ -53,11 +54,25 @@ namespace API.Data
                 .HasOne(u => u.Recipient)
                 .WithMany(m => m.MessagesReceived)
                 .OnDelete(DeleteBehavior.Restrict);
-            
+
             modelBuilder.Entity<Message>()
                 .HasOne(u => u.Sender)
                 .WithMany(m => m.MessagesSent)
                 .OnDelete(DeleteBehavior.Restrict);
+        }
+        
+        protected override void ConfigureConventions(ModelConfigurationBuilder configurationBuilder)
+        {
+            configurationBuilder
+                .Properties<DateTime>()
+                .HaveConversion(typeof(UtcValueConverter));
+        }
+    }
+    class UtcValueConverter : ValueConverter<DateTime, DateTime>
+    {
+        public UtcValueConverter()
+            : base(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc))
+        {
         }
     }
 }
