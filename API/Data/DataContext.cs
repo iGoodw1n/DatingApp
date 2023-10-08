@@ -75,7 +75,7 @@ namespace API.Data
     class UtcValueConverter : ValueConverter<DateTime, DateTime>
     {
         public UtcValueConverter()
-            : base(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc))
+            : base(v => v.ToUniversalTime(), v => DateTime.SpecifyKind(v, DateTimeKind.Utc))
         {
         }
     }
