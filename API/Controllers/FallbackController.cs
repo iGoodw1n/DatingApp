@@ -4,10 +4,15 @@ namespace API.Controllers
 {
     public class FallbackController : Controller
     {
+        private IWebHostEnvironment _env;
+        public FallbackController(IWebHostEnvironment env)
+        {
+            _env = env;
+            
+        }
         public ActionResult Index()
         {
-            return PhysicalFile(Path.Combine(Directory.GetCurrentDirectory(), 
-                "wwwroot", "index.html"), "text/HTML");
+            return PhysicalFile(Path.Combine(_env.WebRootPath, "index.html"), "text/HTML");
         }
     }
 }
